@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}
+Staff Display
+{% endblock title %}
+{% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">S.No</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for staff in staff_members %}
+    <tr>
+      <th scope="row">{{ loop.index }}</th>
+      <td>{{ staff.name }}</td>
+      <td>{{ staff.email }}</td>
+
+      <!-- Status Column -->
+      {% if staff.blacklisted%}
+      <td><span class="badge bg-danger">Blacklisted</span></td>
+      {% elif staff.approved %}
+      <td><span class="badge bg-success">Approved</span></td>
+      {% else %}
+      <td><span class="badge bg-warning">Pending</span></td>
+      {% endif %}
+
+      <!-- Action Column -->
+      {% if staff.blacklisted %}
+      <td>
+        <form method="POST" action="{{ url_for('admin.unblacklist',id=staff.id) }}">
+          <button type="submit" class="btn btn-danger">Unblacklist</button>
+        </form>
+      </td>
+      {% elif staff.approved %}
+      <td>
+        <div class="d-flex gap-2">
+          <form method="POST" action="{{ url_for('admin.blacklist',id=staff.id) }}">
+            <button type="submit" class="btn btn-danger">Blacklist</button>
+          </form>
+        </div>
+      </td>
+      {% else %}
+      <td>
+        <div class="d-flex gap-2">
+          <form method="POST" action="{{ url_for('admin.approve_staff',id=staff.id) }}">
+            <button type="submit" class="btn btn-primary">Approve</button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.blacklist',id=staff.id) }}">
+            <button type="submit" class="btn btn-danger">Blacklist</button>
+          </form>
+        </div>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}

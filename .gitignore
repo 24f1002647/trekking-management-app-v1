@@ -1,4 +1,10 @@
 .env
 __pycache__/
-*.pyc
+*.py[cod]
+venv/
+.venv/
+database/*.db
 instance/*.db
+.DS_Store
+Thumbs.db
+smth.txt
