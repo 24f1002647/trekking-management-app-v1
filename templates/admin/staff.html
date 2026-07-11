@@ -33,14 +33,14 @@ Staff Display
       <!-- Action Column -->
       {% if staff.blacklisted %}
       <td>
-        <form method="POST" action="{{ url_for('admin.unblacklist',id=staff.id) }}">
+        <form method="POST" action="{{ url_for('admin.unblacklist_staff',id=staff.id) }}">
           <button type="submit" class="btn btn-danger">Unblacklist</button>
         </form>
       </td>
       {% elif staff.approved %}
       <td>
         <div class="d-flex gap-2">
-          <form method="POST" action="{{ url_for('admin.blacklist',id=staff.id) }}">
+          <form method="POST" action="{{ url_for('admin.blacklist_staff',id=staff.id) }}">
             <button type="submit" class="btn btn-danger">Blacklist</button>
           </form>
         </div>
@@ -51,7 +51,7 @@ Staff Display
           <form method="POST" action="{{ url_for('admin.approve_staff',id=staff.id) }}">
             <button type="submit" class="btn btn-primary">Approve</button>
           </form>
-          <form method="POST" action="{{ url_for('admin.blacklist',id=staff.id) }}">
+          <form method="POST" action="{{ url_for('admin.blacklist_staff',id=staff.id) }}">
             <button type="submit" class="btn btn-danger">Blacklist</button>
           </form>
         </div>

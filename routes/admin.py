@@ -47,16 +47,13 @@ def approve_staff(id):
         return redirect(url_for("admin.display_staff"))
     flash("Staff member approved","success")
     return redirect(url_for("admin.display_staff"))
-    
-#Helper function to get the staff if exising, else None
-def get_staff(id):
-    return User.query.filter_by(id=id,role="staff").first()
+
 
 
 @admin.route("/staff/<int:id>/blacklist",methods=["POST"])
 @login_required
 @admin_required
-def blacklist(id):
+def blacklist_staff(id):
     staff=get_staff(id)
     if not staff:
         flash("Staff does not exist","danger")
@@ -82,7 +79,7 @@ def blacklist(id):
 @admin.route("/staff/<int:id>/unblacklist",methods=["POST"])
 @login_required
 @admin_required
-def unblacklist(id):
+def unblacklist_staff(id):
     staff=get_staff(id)
     if not staff:
         flash("Staff does not exist","danger")
@@ -104,4 +101,67 @@ def unblacklist(id):
     flash("Staff successfully unblacklisted","success")
     return redirect(url_for("admin.display_staff"))
 
-        
+""" User Module """
+@admin.route('/users')
+@login_required
+@admin_required
+def display_users():
+    user_members=User.query.filter_by(role="user").all()
+    return render_template("admin/user.html",user_members=user_members)
+
+@admin.route("/users/<int:id>/blacklist",methods=["POST"])
+@login_required
+@admin_required
+def blacklist_user(id):
+    user=get_user(id)
+    if not user:
+        flash("User does not exist","danger")
+        return redirect(url_for("admin.display_users"))
+
+    if user.blacklisted:
+        flash("User already blacklisted","danger")
+        return redirect(url_for("admin.display_users"))
+    user.blacklisted=True
+    try:
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        flash("Something went wrong","danger")
+        return redirect(url_for("admin.display_users"))
+    flash("User successfully blacklisted","success")
+    return redirect(url_for("admin.display_users"))
+
+@admin.route("/users/<int:id>/unblacklist",methods=["POST"])
+@login_required
+@admin_required
+def unblacklist_user(id):
+    user=get_user(id)
+
+    if not user:
+        flash("User does not exist","danger")
+        return redirect(url_for("admin.display_users"))
+    
+    if not user.blacklisted:
+        flash("User is not blacklisted","warning")
+        return redirect(url_for("admin.display_users"))
+    
+    user.blacklisted=False
+    try:
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        flash("Something went wrong","danger")
+        return redirect(url_for("admin.display_users"))
+    flash("User successfully unblacklisted","success")
+    return redirect(url_for("admin.display_users"))
+
+""" Helper Functions"""    
+#Helper function to get the staff if exising, else None
+def get_staff(id):
+    return User.query.filter_by(id=id,role="staff").first()
+
+#Helper function to get the user if exising, else None
+def get_user(id):
+    return User.query.filter_by(id=id,role="user").first()

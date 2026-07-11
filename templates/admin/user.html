@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}
+User Display
+{% endblock title %}
+{% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">S.No</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for user in user_members %}
+    <tr>
+      <th scope="row">{{ loop.index }}</th>
+      <td>{{ user.name }}</td>
+      <td>{{ user.email }}</td>
+
+      <!-- Status Column -->
+      {% if user.blacklisted%}
+      <td><span class="badge bg-danger">Blacklisted</span></td>
+      {% else %}
+      <td><span class="badge bg-success">Active</span></td>
+      {% endif %}
+
+      <!-- Action Column -->
+      {% if user.blacklisted %}
+      <td>
+        <form method="POST" action="{{ url_for('admin.unblacklist_user',id=user.id) }}">
+          <button type="submit" class="btn btn-danger">Unblacklist</button>
+        </form>
+      </td>
+      {% else %}
+      <td>
+        <div class="d-flex gap-2">
+          <form method="POST" action="{{ url_for('admin.blacklist_user',id=user.id) }}">
+            <button type="submit" class="btn btn-danger">Blacklist</button>
+          </form>
+        </div>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}
