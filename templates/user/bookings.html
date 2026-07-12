@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Bookings
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">My Bookings</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>Trek</th>
+            <th>Location</th>
+            <th>Booking Date</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if bookings %}
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ booking.trek.name }}</td>
+            <td>{{ booking.trek.location }}</td>
+            <td>{{ booking.booking_date.strftime("%d-%m-%Y") }}</td>
+            <td>{{ booking.status }}</td>
+            <td>
+                {% if booking.status == "Booked" %}
+                <form method="POST" action="{{ url_for('user.cancel_booking', id=booking.id) }}">
+                    <button class="btn btn-danger btn-sm">
+                        Cancel
+                    </button>
+                </form>
+                {% else %}
+                —
+                {% endif %}
+            </td>
+        </tr>
+
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="6" class="text-center">
+                No bookings found.
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

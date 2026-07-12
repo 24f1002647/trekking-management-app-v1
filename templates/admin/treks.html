@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}
+Trek Display
+{% endblock title %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Manage Treks</h2>
+    <a href="{{ url_for('admin.create_trek') }}" class="btn btn-primary">
+        + Create Trek
+    </a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>Trek Name</th>
+            <th>Location</th>
+            <th>Difficulty</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Assigned Staff</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if treks %}
+        {% for trek in treks %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ trek.name }}</td>
+            <td>{{ trek.location }}</td>
+            <td>{{ trek.difficulty }}</td>
+            <td>{{ trek.duration }} days</td>
+            <td>{{ trek.status }}</td>
+            <td>{{ trek.staff.name if trek.staff else "Not Assigned" }}</td>
+            <td>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('admin.edit_trek', id=trek.id) }}" class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+                    <form method="POST" action="{{ url_for('admin.delete_trek', id=trek.id) }}">
+
+                        <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Delete this trek?')">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="8" class="text-center">
+                No treks found.
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock content %}

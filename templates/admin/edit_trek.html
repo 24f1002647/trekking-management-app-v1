@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}
+Edit Trek
+{% endblock title %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Edit Trek</h2>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Trek Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ trek.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="location" class="form-label">Trek Location</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ trek.location }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Trek Description</label>
+            <textarea class="form-control" id="description" name="description"
+                rows="2">{{ trek.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Select Difficulty</label>
+            <select name="difficulty" id="difficulty" class="form-select" required>
+                <option value="">-- Select the Difficulty --</option>
+                <option value="Easy" {% if trek.difficulty=="Easy" %}selected{% endif %}>
+                    Easy
+                </option>
+                <option value="Moderate" {% if trek.difficulty=="Moderate" %}selected{% endif %}>
+                    Moderate
+                </option>
+                <option value="Hard" {% if trek.difficulty=="Hard" %}selected{% endif %}>
+                    Hard
+                </option>
+
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="duration" class="form-label">Trek Duration</label>
+            <input type="number" class="form-control" id="duration" name="duration" min="1" value="{{ trek.duration }}"
+                required>
+        </div>
+        <div class="mb-3">
+            <label for="capacity" class="form-label">Trek Capacity</label>
+            <input type="number" class="form-control" id="capacity" name="capacity" min="1" value="{{ trek.capacity }}"
+                required>
+        </div>
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Trek Start Date</label>
+            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ trek.start_date }}"
+                required>
+        </div>
+        <div class="mb-3">
+            <label for="end_date" class="form-label">Trek End Date</label>
+            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ trek.end_date }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="staff-id" class="form-label">Assigned Staff</label>
+            <select name="staff_id" class="form-select" id="staff-id">
+                <option value="">-- Select Staff --</option>
+
+                {% for staff in staff_members %}
+                <option value="{{ staff.id }}" {% if trek.staff_id==staff.id %}selected{% endif %}>
+                    {{ staff.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+
+            <select name="status" id="status" class="form-select" required>
+                <option value="Open" {% if trek.status=="Open" %}selected{% endif %}>
+                    Open
+                </option>
+
+                <option value="Closed" {% if trek.status=="Closed" %}selected{% endif %}>
+                    Closed
+                </option>
+
+                <option value="Completed" {% if trek.status=="Completed" %}selected{% endif %}>
+                    Completed
+                </option>
+                
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <a href="{{ url_for('admin.display_treks') }}" class="btn btn-secondary">
+                Back
+            </a>
+            <button type="submit" class="btn btn-primary">Update Trek</button>
+        </div>
+
+    </form>
+</div>
+{% endblock content %}

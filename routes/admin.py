@@ -2,6 +2,8 @@ from flask import Blueprint,render_template,request,flash,redirect,url_for
 from flask_login import login_required
 from utils.decorators import admin_required 
 from models.user import User
+from models.trek import Trek
+from datetime import datetime
 
 from extensions import db
 
@@ -157,6 +159,165 @@ def unblacklist_user(id):
     flash("User successfully unblacklisted","success")
     return redirect(url_for("admin.display_users"))
 
+""" Admin Trek Module """
+@admin.route("/treks")
+@login_required
+@admin_required
+def display_treks():
+    treks=Trek.query.all()
+    return render_template("admin/treks.html",treks=treks)
+
+@admin.route("/treks/create",methods=["GET","POST"])
+@login_required
+@admin_required
+def create_trek():
+    staff_members=User.query.filter_by(role="staff",approved=True,blacklisted=False).all()
+    if request.method=="POST":
+        name=request.form.get("name").strip()
+        location=request.form.get("location").strip()
+        description=request.form.get("description","").strip()
+        difficulty=request.form.get("difficulty")
+        
+        duration=request.form.get("duration", type=int)
+        capacity=request.form.get("capacity", type=int)
+        if duration < 1 or capacity < 1:
+            flash("Duration and capacity must be greater than zero.", "danger")
+            return redirect(url_for("admin.create_trek"))
+
+        start_date=datetime.strptime(request.form.get("start_date"),"%Y-%m-%d").date()
+        end_date=datetime.strptime(request.form.get("end_date"),"%Y-%m-%d").date()
+        if end_date<start_date:
+            flash("End date cannot be before the start date","danger")
+            return redirect(url_for("admin.create_trek"))
+        
+        staff_id=request.form.get("staff_id")
+        if staff_id:
+            staff_id=int(staff_id)
+            staff=User.query.filter_by(id=staff_id,role="staff",approved=True,blacklisted=False).first()
+            if not staff:
+                flash("Invalid Staff","danger")
+                return redirect(url_for("admin.create_trek"))
+        else:
+            staff_id=None
+        trek = Trek(
+        name=name,
+        location=location,
+        description=description,
+        difficulty=difficulty,
+        duration=duration,
+        capacity=capacity,
+        available_slots=capacity,
+        start_date=start_date,
+        end_date=end_date,
+        staff_id=staff_id
+        )
+        db.session.add(trek)
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            flash("Something went wrong.", "danger")
+            return redirect(url_for("admin.create_trek"))
+        flash("Trek created successfully.", "success")
+        return redirect(url_for("admin.display_treks"))
+
+    return render_template("admin/create_trek.html",staff_members=staff_members)
+
+@admin.route("/treks/<int:id>/edit",methods=["GET","POST"])
+@login_required
+@admin_required
+def edit_trek(id):
+    trek=get_trek(id)
+    if not trek:
+        flash("Trek not found","danger")
+        return redirect(url_for("admin.display_treks"))
+    staff_members=User.query.filter_by(role="staff",approved=True,blacklisted=False).all()
+
+    if request.method=="POST":
+        name=request.form.get("name").strip()
+        location=request.form.get("location").strip()
+        description=request.form.get("description","").strip()
+        difficulty=request.form.get("difficulty")
+        status=request.form.get("status")
+        duration=request.form.get("duration",type=int)
+        capacity=request.form.get("capacity",type=int)
+        start_date=datetime.strptime(request.form.get("start_date"),"%Y-%m-%d").date()
+        end_date=datetime.strptime(request.form.get("end_date"),"%Y-%m-%d").date()
+
+        if duration < 1 or capacity < 1:
+            flash("Duration and capacity must be greater than zero.", "danger")
+            return redirect(url_for("admin.edit_trek",id=trek.id))
+
+        if end_date<start_date:
+            flash("End date cannot be before the start date","danger")
+            return redirect(url_for("admin.edit_trek",id=trek.id))
+        
+        staff_id=request.form.get("staff_id")
+        if staff_id:
+            staff_id=int(staff_id)
+            staff=User.query.filter_by(id=staff_id,role="staff",approved=True,blacklisted=False).first()
+            if not staff:
+                flash("Invalid Staff","danger")
+                return redirect(url_for("admin.edit_trek",id=trek.id))
+        else:
+            staff_id=None
+        
+        #booking validation
+        booked_users=trek.capacity-trek.available_slots
+        if capacity<booked_users:
+            flash("Cannot reduce capacity below the number of booked users.","danger")
+            return redirect(url_for("admin.edit_trek",id=trek.id))
+        
+        #Updating the trek object
+        trek.available_slots=capacity-booked_users
+        trek.name = name
+        trek.location = location
+        trek.description = description
+        trek.difficulty = difficulty
+
+        trek.duration = duration
+        trek.capacity = capacity
+
+        trek.start_date = start_date
+        trek.end_date = end_date
+
+        trek.staff_id = staff_id
+        trek.status = status
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            flash("Something went wrong.", "danger")
+            return redirect(url_for("admin.edit_trek", id=trek.id))
+
+        flash("Trek updated successfully.", "success")
+        return redirect(url_for("admin.display_treks"))
+    
+    return render_template("admin/edit_trek.html",trek=trek,staff_members=staff_members)
+
+@admin.route("/treks/<int:id>/delete", methods=["POST"])
+@login_required
+@admin_required
+def delete_trek(id):
+    trek = get_trek(id)
+    if not trek:
+        flash("Trek not found.", "danger")
+        return redirect(url_for("admin.display_treks"))
+    try:
+        db.session.delete(trek)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        flash("Something went wrong.", "danger")
+        return redirect(url_for("admin.display_treks"))
+
+    flash("Trek deleted successfully.", "success")
+    return redirect(url_for("admin.display_treks"))
+
+
 """ Helper Functions"""    
 #Helper function to get the staff if exising, else None
 def get_staff(id):
@@ -165,3 +326,6 @@ def get_staff(id):
 #Helper function to get the user if exising, else None
 def get_user(id):
     return User.query.filter_by(id=id,role="user").first()
+
+def get_trek(id):
+    return db.session.get(Trek,id)

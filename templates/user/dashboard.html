@@ -3,5 +3,48 @@
 User Dashboard
 {% endblock title %}
 {% block content %}
-User Dashboard
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Available Treks</h2>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Difficulty</th>
+            <th>Slots</th>
+            <th>Staff</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if available_treks %}
+        {% for trek in available_treks %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ trek.name }}</td>
+            <td>{{ trek.location }}</td>
+            <td>{{ trek.difficulty }}</td>
+            <td>{{ trek.available_slots }}</td>
+            <td>{{ trek.staff.name if trek.staff else "Not Assigned" }}</td>
+            <td>{{ trek.action }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('user.book_trek', id=trek.id) }}">
+                    <button class="btn btn-success btn-sm">
+                        Book
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">
+                No treks available.
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
 {% endblock content %}
