@@ -1,7 +1,106 @@
 {% extends "base.html" %}
+
 {% block title %}
-    Admin Dashboard
-{% endblock title %}
+Admin Dashboard
+{% endblock %}
+
 {% block content %}
-    Admin Dashboard
-{% endblock content %}
+
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-primary">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <h2>{{ total_users }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-success">
+            <div class="card-body">
+                <h5 class="card-title">Staff</h5>
+                <h2>{{ total_staff }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-warning">
+            <div class="card-body">
+                <h5 class="card-title">Pending Staff</h5>
+                <h2>{{ pending_staff }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-info">
+            <div class="card-body">
+                <h5 class="card-title">Treks</h5>
+                <h2>{{ total_treks }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm border-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Bookings</h5>
+                <h2>{{ total_bookings }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm border-success">
+            <div class="card-body">
+                <h5 class="card-title">Open Treks</h5>
+                <h2>{{ open_treks }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm border-dark">
+            <div class="card-body">
+                <h5 class="card-title">Completed Treks</h5>
+                <h2>{{ completed_treks }}</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr class="my-5">
+
+<h4 class="mb-3">Quick Actions</h4>
+
+<div class="d-flex flex-wrap gap-3">
+
+    <a href="{{ url_for('admin.create_trek') }}" class="btn btn-success">
+        + Create Trek
+    </a>
+
+    <a href="{{ url_for('admin.display_treks') }}" class="btn btn-primary">
+        Manage Treks
+    </a>
+
+    <a href="{{ url_for('admin.display_staff') }}" class="btn btn-warning">
+        Manage Staff
+    </a>
+
+    <a href="{{ url_for('admin.display_users') }}" class="btn btn-info">
+        Manage Users
+    </a>
+
+    <a href="{{ url_for('admin.display_bookings') }}" class="btn btn-secondary">
+        View Bookings
+    </a>
+
+</div>
+
+{% endblock %}

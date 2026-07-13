@@ -17,12 +17,12 @@ from routes.auth import auth
 from routes.admin import admin
 from routes.staff import staff
 from routes.user import user
+from routes.profile import profile
 app.register_blueprint(auth)
 app.register_blueprint(admin,url_prefix="/admin")
 app.register_blueprint(staff,url_prefix="/staff")
 app.register_blueprint(user,url_prefix="/user")
-
-
+app.register_blueprint(profile,url_prefix="/profile")
 @app.route("/")
 def home():
     return render_template('index.html')

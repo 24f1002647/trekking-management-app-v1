@@ -1,12 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Trekking Management Application</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
 </head>
-<body>
-    <h1>Trekking Management Application</h1>
-    <p>Welcome to our first Flask webpage!</p>
+
+<body class="bg-light">
+
+<div class="container">
+
+    <div class="row justify-content-center align-items-center"
+         style="min-height:100vh;">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-body text-center p-5">
+
+                    <h1 class="display-4 mb-3">
+
+                        Trekking Management System
+
+                    </h1>
+
+                    <p class="lead">
+
+                        Manage treks, bookings and participants efficiently through a secure role-based portal.
+
+                    </p>
+
+                    <hr>
+
+                    <p>
+
+                        Built using
+
+                        <strong>Flask</strong>,
+                        <strong>SQLAlchemy</strong>,
+                        <strong>SQLite</strong>,
+                        <strong>Bootstrap 5</strong>
+
+                    </p>
+
+                    <div class="mt-4">
+
+                        <a href="{{ url_for('auth.login') }}"
+                           class="btn btn-primary btn-lg">
+
+                            Login
+
+                        </a>
+
+                        <a href="{{ url_for('auth.register') }}"
+                           class="btn btn-success btn-lg ms-2">
+
+                            Register
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

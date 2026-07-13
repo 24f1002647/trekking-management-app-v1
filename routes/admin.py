@@ -1,8 +1,11 @@
 from flask import Blueprint,render_template,request,flash,redirect,url_for
 from flask_login import login_required
 from utils.decorators import admin_required 
+
 from models.user import User
 from models.trek import Trek
+from models.booking import Booking
+
 from datetime import datetime
 
 from extensions import db
@@ -15,14 +18,34 @@ def dashboard():
     total_users=User.query.filter_by(role="user").count()
     total_staff=User.query.filter_by(role="staff").count()
     pending_staff=User.query.filter_by(role="staff",approved=False).count()
-    return render_template("admin/dashboard.html",total_users=total_users,total_staff=total_staff,pending_staff=pending_staff)
+
+    total_treks=Trek.query.count()
+    total_bookings=Booking.query.count()
+    open_treks=Trek.query.filter_by(status="Open").count()
+    completed_treks=Trek.query.filter_by(status="Completed").count()
+    return render_template("admin/dashboard.html",total_users=total_users,total_staff=total_staff,
+                           pending_staff=pending_staff,total_treks=total_treks,total_bookings=total_bookings,
+                           open_treks=open_treks,completed_treks=completed_treks)
+
+"""  Staff Module   """
 
 @admin.route('/staff')
 @login_required
 @admin_required
 def display_staff():
-    staff_members=User.query.filter_by(role="staff").all()
-    return render_template("admin/staff.html",staff_members=staff_members)
+    search = request.args.get("search", "").strip()
+    query = User.query.filter_by(role="staff")
+    if search:
+        if search.isdigit():
+            query = query.filter(
+                (User.id == int(search)) |
+                (User.name.ilike(f"%{search}%"))
+            )
+        else:
+            query = query.filter(User.name.ilike(f"%{search}%"))
+
+    staff_members = query.all()
+    return render_template("admin/staff.html",staff_members=staff_members,search=search)
 
 @admin.route("/staff/<int:id>/approve",methods=["POST"])
 @login_required
@@ -108,8 +131,20 @@ def unblacklist_staff(id):
 @login_required
 @admin_required
 def display_users():
-    user_members=User.query.filter_by(role="user").all()
-    return render_template("admin/user.html",user_members=user_members)
+    search=request.args.get("search","").strip()
+    query=User.query.filter_by(role="user")
+
+    if search:
+        if search.isdigit():
+            query = query.filter(
+                (User.id == int(search)) |
+                (User.name.ilike(f"%{search}%"))
+            )
+        else:
+            query = query.filter(User.name.ilike(f"%{search}%"))
+    user_members=query.all()
+
+    return render_template("admin/user.html",user_members=user_members,search=search)
 
 @admin.route("/users/<int:id>/blacklist",methods=["POST"])
 @login_required
@@ -164,8 +199,26 @@ def unblacklist_user(id):
 @login_required
 @admin_required
 def display_treks():
-    treks=Trek.query.all()
-    return render_template("admin/treks.html",treks=treks)
+
+    search = request.args.get("search", "").strip()
+    query = Trek.query
+    if search:
+        if search.isdigit():
+            query = query.filter(
+                (Trek.id == int(search)) |
+                (Trek.name.ilike(f"%{search}%"))
+            )
+        else:
+            query = query.filter(
+                Trek.name.ilike(f"%{search}%")
+            )
+        
+    treks = query.all()
+    return render_template(
+        "admin/treks.html",
+        treks=treks,
+        search=search
+    )
 
 @admin.route("/treks/create",methods=["GET","POST"])
 @login_required
@@ -316,6 +369,15 @@ def delete_trek(id):
 
     flash("Trek deleted successfully.", "success")
     return redirect(url_for("admin.display_treks"))
+
+@admin.route("/bookings")
+@login_required
+@admin_required
+def display_bookings():
+    bookings=Booking.query.order_by(Booking.booking_date.desc()).all()
+    return render_template("admin/bookings.html",bookings=bookings)
+
+
 
 
 """ Helper Functions"""    

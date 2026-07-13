@@ -14,6 +14,7 @@ My Bookings
             <th>Location</th>
             <th>Booking Date</th>
             <th>Status</th>
+            <th>Trek Status</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -26,10 +27,11 @@ My Bookings
             <td>{{ booking.trek.location }}</td>
             <td>{{ booking.booking_date.strftime("%d-%m-%Y") }}</td>
             <td>{{ booking.status }}</td>
+            <td>{{ booking.trek.status }}</td>
             <td>
                 {% if booking.status == "Booked" %}
-                <form method="POST" action="{{ url_for('user.cancel_booking', id=booking.id) }}">
-                    <button class="btn btn-danger btn-sm">
+                <form method="POST" action="{{ url_for('user.cancel_booking', id=booking.id) }}" onsubmit="return confirm('Cancel this booking?')">
+                    <button type="submit" class="btn btn-danger btn-sm">
                         Cancel
                     </button>
                 </form>
@@ -42,7 +44,7 @@ My Bookings
         {% endfor %}
         {% else %}
         <tr>
-            <td colspan="6" class="text-center">
+            <td colspan="7" class="text-center">
                 No bookings found.
             </td>
         </tr>

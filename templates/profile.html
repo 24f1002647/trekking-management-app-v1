@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center mt-4">
+
+    <div class="col-lg-6 col-md-8">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    My Profile
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if current_user.role == "admin" %}
+                <div class="alert alert-info">
+                    This administrator account is predefined by the system and cannot be modified.
+                </div>
+                {% endif %}
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Name
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="name"
+                            value="{{ current_user.name }}"
+                            {% if current_user.role == "admin" %}readonly{% endif %}
+                            required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            name="email"
+                            value="{{ current_user.email }}"
+                            {% if current_user.role == "admin" %}readonly{% endif %}
+                            required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Role
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ current_user.role.title() }}"
+                            readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Account Status
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ 'Blacklisted' if current_user.blacklisted else 'Active' }}"
+                            readonly>
+                    </div>
+
+                    {% if current_user.role == "staff" %}
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Approval Status
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ 'Approved' if current_user.approved else 'Pending Approval' }}"
+                            readonly>
+                    </div>
+                    {% endif %}
+
+                    {% if current_user.role != "admin" %}
+                    <div class="mb-3">
+                        <label class="form-label">
+                            New Password
+                        </label>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            name="password"
+                            autocomplete="new-password"
+                            placeholder="Leave blank to keep your current password">
+
+                        <small class="text-muted">
+                            Leave this field blank if you don't want to change your password.
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+
+                        {% if current_user.role == "admin" %}
+                            <a href="{{ url_for('admin.dashboard') }}"
+                               class="btn btn-secondary">
+                                ← Back
+                            </a>
+
+                        {% elif current_user.role == "staff" %}
+                            <a href="{{ url_for('staff.dashboard') }}"
+                               class="btn btn-secondary">
+                                ← Back
+                            </a>
+
+                        {% else %}
+                            <a href="{{ url_for('user.dashboard') }}"
+                               class="btn btn-secondary">
+                                ← Back
+                            </a>
+                        {% endif %}
+
+                        {% if current_user.role != "admin" %}
+                        <button
+                            type="submit"
+                            class="btn btn-primary">
+                            Update Profile
+                        </button>
+                        {% endif %}
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

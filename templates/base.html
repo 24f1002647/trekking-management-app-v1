@@ -1,31 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>
         {% block title %}
-            Trekking Management
-        {% endblock title %}
+        Trekking Management
+        {% endblock %}
     </title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                Trekking Management
+            </a>
+
+            <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav ms-auto">
+
+                    {% if current_user.is_authenticated %}
+
+                        {% if current_user.role=="admin" %}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                    Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.display_treks') }}">
+                                    Treks
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.display_staff') }}">
+                                    Staff
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.display_users') }}">
+                                    Users
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.display_bookings') }}">
+                                    Bookings
+                                </a>
+                            </li>
+
+                        {% elif current_user.role=="staff" %}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('staff.dashboard') }}">
+                                    Dashboard
+                                </a>
+                            </li>
+
+                        {% elif current_user.role=="user" %}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('user.dashboard') }}">
+                                    Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('user.my_bookings') }}">
+                                    My Bookings
+                                </a>
+                            </li>
+
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('profile.display_profile') }}">
+                                Profile
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                                Logout
+                            </a>
+                        </li>
+
+                    {% else %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('home') }}">
+                                Home
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">
+                                Login
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">
+                                Register
+                            </a>
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
     <div class="container mt-3">
-        {% with messages=get_flashed_messages(with_categories=True) %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
             {% if messages %}
+
                 {% for category, message in messages %}
+
                     <div class="alert alert-{{ category }} alert-dismissible fade show">
+
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert">
+                        </button>
+
                     </div>
+
                 {% endfor %}
+
             {% endif %}
+
         {% endwith %}
+
     </div>
-    {% block content %}
-    {% endblock content %}
-    <!-- Bootstrap JS -->
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Page Content -->
+    <div class="container mt-4">
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

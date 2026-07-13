@@ -1,7 +1,49 @@
 {% extends "base.html" %}
+
 {% block title %}
 Staff Dashboard
-{% endblock title %}
+{% endblock %}
+
 {% block content %}
-Staff Dashboard
-{% endblock content %}
+<h2 class="mb-4">Assigned Treks</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>Trek</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Available Slots</th>
+            <th>Booked Users</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if assigned_treks %}
+        {% for trek in assigned_treks %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ trek.name }}</td>
+            <td>{{ trek.location }}</td>
+            <td>{{ trek.status }}</td>
+            <td>{{ trek.available_slots }}</td>
+            <td>{{ trek.capacity - trek.available_slots }}</td>
+            <td>
+                <a href="{{ url_for('staff.manage_trek', id=trek.id) }}" class="btn btn-primary btn-sm">
+                    Manage
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">
+                No treks assigned.
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{% endblock %}

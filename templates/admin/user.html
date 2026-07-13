@@ -3,6 +3,24 @@
 User Display
 {% endblock title %}
 {% block content %}
+<h2 class="mb-3">Manage Users</h2>
+<form method="GET" class="mb-3">
+    <div class="input-group">
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Search users..."
+            value="{{ search }}">
+
+        <button
+            class="btn btn-primary"
+            type="submit">
+            Search
+        </button>
+
+    </div>
+</form>
 <table class="table">
   <thead>
     <tr>
