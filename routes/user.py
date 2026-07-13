@@ -29,12 +29,24 @@ def dashboard():
         query = query.filter(Trek.location.ilike(f"%{location}%"))
 
     available_treks = query.all()
+
+    active_bookings = Booking.query.filter_by(
+        user_id=current_user.id,
+        status="Booked"
+    ).count()
+
+    completed_treks = Booking.query.filter_by(
+        user_id=current_user.id,
+        status="Completed"
+    ).count()
     return render_template(
         "user/dashboard.html",
         available_treks=available_treks,
         search=search,
         difficulty=difficulty,
-        location=location
+        location=location,
+        active_bookings=active_bookings,
+        completed_treks=completed_treks
     )
 
 @user.route("/treks/<int:id>/book",methods=["POST"])

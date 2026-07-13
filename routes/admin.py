@@ -288,6 +288,10 @@ def edit_trek(id):
     staff_members=User.query.filter_by(role="staff",approved=True,blacklisted=False).all()
 
     if request.method=="POST":
+        if trek.status == "Completed":
+            flash("Completed treks cannot be modified.","warning")
+            return redirect(url_for("admin.display_treks"))
+        
         name=request.form.get("name").strip()
         location=request.form.get("location").strip()
         description=request.form.get("description","").strip()
@@ -322,6 +326,13 @@ def edit_trek(id):
             flash("Cannot reduce capacity below the number of booked users.","danger")
             return redirect(url_for("admin.edit_trek",id=trek.id))
         
+        #status validation
+        if status == "Completed":
+            for booking in trek.bookings:
+                if booking.status == "Booked":
+                    booking.status = "Completed"
+
+
         #Updating the trek object
         trek.available_slots=capacity-booked_users
         trek.name = name
@@ -357,6 +368,12 @@ def delete_trek(id):
     trek = get_trek(id)
     if not trek:
         flash("Trek not found.", "danger")
+        return redirect(url_for("admin.display_treks"))
+    if trek.bookings:
+        flash(
+            "Cannot delete a trek that has existing bookings.",
+            "warning"
+        )
         return redirect(url_for("admin.display_treks"))
     try:
         db.session.delete(trek)

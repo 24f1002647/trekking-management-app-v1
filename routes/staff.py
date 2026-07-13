@@ -15,8 +15,36 @@ staff=Blueprint("staff",__name__)
 @login_required
 @staff_required
 def dashboard():
-    assigned_treks=Trek.query.filter_by(staff_id=current_user.id).all()
-    return render_template("staff/dashboard.html",assigned_treks=assigned_treks)
+
+    assigned_treks = Trek.query.filter_by(
+        staff_id=current_user.id
+    ).all()
+
+    total_assigned = len(assigned_treks)
+
+    open_treks = sum(
+        trek.status == "Open"
+        for trek in assigned_treks
+    )
+
+    completed_treks = sum(
+        trek.status == "Completed"
+        for trek in assigned_treks
+    )
+
+    total_participants = sum(
+        trek.capacity - trek.available_slots
+        for trek in assigned_treks
+    )
+
+    return render_template(
+        "staff/dashboard.html",
+        assigned_treks=assigned_treks,
+        total_assigned=total_assigned,
+        open_treks=open_treks,
+        completed_treks=completed_treks,
+        total_participants=total_participants
+    )
 
 @staff.route("/treks/<int:id>",methods=["GET","POST"])
 @login_required
@@ -49,12 +77,12 @@ def manage_trek(id):
             flash("Staff cannot reduce available slots.","danger")
             return redirect(url_for("staff.manage_trek", id=trek.id))
         
-        
+        if status == "Completed":
+            for booking in trek.bookings:
+                if booking.status == "Booked":
+                    booking.status = "Completed"
+
         trek.status=status
-        if status=="Completed":
-            for booking in bookings:
-                if booking.status=="Booked":
-                    booking.status="Completed"
 
         trek.available_slots=available_slots
         trek.capacity=booked_users+available_slots

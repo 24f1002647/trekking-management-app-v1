@@ -1,93 +1,271 @@
 {% extends "base.html" %}
+
 {% block title %}
 User Dashboard
-{% endblock title %}
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Available Treks</h2>
+
+<div class="mb-4">
+
+    <h2>
+        Welcome, {{ current_user.name }}
+    </h2>
+
+    <p class="text-muted">
+        Browse and book your next trekking adventure.
+    </p>
+
 </div>
 
-<form method="GET" class="row g-3 mb-4">
+<!-- Dashboard Cards -->
+
+<div class="row mb-4">
 
     <div class="col-md-4">
-        <input type="text" name="search" class="form-control" placeholder="Search Trek..." value="{{ search }}">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Available Treks
+                </h5>
+
+                <h2 class="text-primary">
+                    {{ available_treks|length }}
+                </h2>
+            </div>
+        </div>
     </div>
 
-    <div class="col-md-3">
-        <select name="difficulty" class="form-select">
-            <option value="">All Difficulties</option>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Active Bookings
+                </h5>
 
-            <option value="Easy" {% if difficulty=="Easy" %}selected{% endif %}>
-                Easy
-            </option>
-
-            <option value="Moderate" {% if difficulty=="Moderate" %}selected{% endif %}>
-                Moderate
-            </option>
-
-            <option value="Hard" {% if difficulty=="Hard" %}selected{% endif %}>
-                Hard
-            </option>
-
-        </select>
+                <h2 class="text-success">
+                    {{ active_bookings }}
+                </h2>
+            </div>
+        </div>
     </div>
 
-    <div class="col-md-3">
-        <input type="text" name="location" class="form-control" placeholder="Location" value="{{ location }}">
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Completed Treks
+                </h5>
+
+                <h2 class="text-secondary">
+                    {{ completed_treks }}
+                </h2>
+            </div>
+        </div>
     </div>
 
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100" type="submit">
-            Filter
-        </button>
-    </div>
-    <div class="col-md-2">
-        <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary w-100">
-            Clear
-        </a>
+</div>
+
+<!-- Filters -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        Search & Filter Treks
     </div>
 
-</form>
+    <div class="card-body">
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>S.No</th>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Difficulty</th>
-            <th>Slots</th>
-            <th>Staff</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% if available_treks %}
-        {% for trek in available_treks %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ trek.name }}</td>
-            <td>{{ trek.location }}</td>
-            <td>{{ trek.difficulty }}</td>
-            <td>{{ trek.available_slots }}</td>
-            <td>{{ trek.staff.name if trek.staff else "Not Assigned" }}</td>
-            <td>{{ trek.action }}</td>
-            <td>
-                <form method="POST" action="{{ url_for('user.book_trek', id=trek.id) }}">
-                    <button class="btn btn-success btn-sm">
-                        Book
-                    </button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-        {% else %}
-        <tr>
-            <td colspan="7" class="text-center">
-                No treks available.
-            </td>
-        </tr>
-        {% endif %}
-    </tbody>
-</table>
-{% endblock content %}
+        <form method="GET" class="row g-3">
+
+            <div class="col-md-4">
+
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search Trek..."
+                    value="{{ search }}">
+
+            </div>
+
+            <div class="col-md-3">
+
+                <select
+                    name="difficulty"
+                    class="form-select">
+
+                    <option value="">
+                        All Difficulties
+                    </option>
+
+                    <option value="Easy"
+                        {% if difficulty=="Easy" %}selected{% endif %}>
+                        Easy
+                    </option>
+
+                    <option value="Moderate"
+                        {% if difficulty=="Moderate" %}selected{% endif %}>
+                        Moderate
+                    </option>
+
+                    <option value="Hard"
+                        {% if difficulty=="Hard" %}selected{% endif %}>
+                        Hard
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <input
+                    type="text"
+                    name="location"
+                    class="form-control"
+                    placeholder="Location"
+                    value="{{ location }}">
+
+            </div>
+
+            <div class="col-md-1">
+
+                <button
+                    class="btn btn-primary w-100"
+                    type="submit">
+
+                    Go
+
+                </button>
+
+            </div>
+
+            <div class="col-md-1">
+
+                <a
+                    href="{{ url_for('user.dashboard') }}"
+                    class="btn btn-secondary w-100">
+
+                    Clear
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Treks -->
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        Available Treks
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-bordered table-striped table-hover align-middle mb-0">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Difficulty</th>
+                    <th>Available Slots</th>
+                    <th>Staff</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% if available_treks %}
+
+                    {% for trek in available_treks %}
+
+                    <tr>
+
+                        <td>{{ loop.index }}</td>
+
+                        <td>{{ trek.name }}</td>
+
+                        <td>{{ trek.location }}</td>
+
+                        <td>
+
+                            {% if trek.difficulty=="Easy" %}
+                                <span class="badge bg-success">Easy</span>
+
+                            {% elif trek.difficulty=="Moderate" %}
+                                <span class="badge bg-warning text-dark">
+                                    Moderate
+                                </span>
+
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    Hard
+                                </span>
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ trek.available_slots }}
+                        </td>
+
+                        <td>
+                            {{ trek.staff.name if trek.staff else "Not Assigned" }}
+                        </td>
+
+                        <td>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('user.book_trek', id=trek.id) }}">
+
+                                <button
+                                    class="btn btn-success btn-sm">
+
+                                    Book Trek
+
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="7" class="text-center">
+
+                            No treks available.
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

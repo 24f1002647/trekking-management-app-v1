@@ -5,85 +5,330 @@ Manage Trek
 {% endblock %}
 
 {% block content %}
-<h2 class="mb-4">{{ trek.name }}</h2>
+
 <div class="mb-4">
-    <p><strong>Location:</strong> {{ trek.location }}</p>
-    <p><strong>Difficulty:</strong> {{ trek.difficulty }}</p>
-    <p><strong>Status:</strong> {{ trek.status }}</p>
-    <p><strong>Available Slots:</strong> {{ trek.available_slots }}</p>
-    <p><strong>Capacity:</strong> {{ trek.capacity }}</p>
+
+    <h2>
+        {{ trek.name }}
+    </h2>
+
+    <p class="text-muted">
+        Manage trek details and participants.
+    </p>
+
 </div>
 
-<h4 class="mt-4">Update Trek</h4>
-<form method="POST">
-    <div class="mb-3">
-        <label class="form-label">Status</label>
-        <select name="status" class="form-select">
-            <option value="Open"
-                {% if trek.status=="Open" %}selected{% endif %}>
-                Open
-            </option>
-            <option value="Closed"
-                {% if trek.status=="Closed" %}selected{% endif %}>
-                Closed
-            </option>
-            <option value="Completed"
-                {% if trek.status=="Completed" %}selected{% endif %}>
-                Completed
-            </option>
-        </select>
+<!-- Trek Information -->
+
+<div class="row mb-4">
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm text-center">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Location
+                </h6>
+
+                <h5>
+                    {{ trek.location }}
+                </h5>
+
+            </div>
+
+        </div>
+
     </div>
-    <div class="mb-3">
-        <label class="form-label">
-            Available Slots
-        </label>
-        <input
-            type="number"
-            name="available_slots"
-            class="form-control"
-            min="0"
-            value="{{ trek.available_slots }}">
-        </div>
-        <div class="mb-3">
-            <a href="{{ url_for('staff.dashboard') }}" class="btn btn-secondary">Back</a>
-            <button
-            type="submit"
-            class="btn btn-primary">
-            Update Trek
-        </button>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm text-center">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Difficulty
+                </h6>
+
+                <h5>
+
+                    {% if trek.difficulty=="Easy" %}
+                        <span class="badge bg-success">Easy</span>
+
+                    {% elif trek.difficulty=="Moderate" %}
+                        <span class="badge bg-warning text-dark">
+                            Moderate
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-danger">
+                            Hard
+                        </span>
+                    {% endif %}
+
+                </h5>
+
+            </div>
+
         </div>
 
-</form>
+    </div>
 
-<h4>Participants</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>S.No</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Booking Date</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% if bookings %}
-            {% for booking in bookings %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ booking.user.name }}</td>
-                <td>{{ booking.user.email }}</td>
-                <td>{{ booking.booking_date.strftime("%d-%m-%Y") }}</td>
-                <td>{{ booking.status }}</td>
-            </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="5" class="text-center">
-                    No participants yet.
-                </td>
-            </tr>
-        {% endif %}
-    </tbody>
-</table>
+    <div class="col-md-3">
+
+        <div class="card shadow-sm text-center">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Status
+                </h6>
+
+                <h5>
+
+                    {% if trek.status=="Open" %}
+                        <span class="badge bg-success">
+                            Open
+                        </span>
+
+                    {% elif trek.status=="Closed" %}
+                        <span class="badge bg-warning text-dark">
+                            Closed
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            Completed
+                        </span>
+
+                    {% endif %}
+
+                </h5>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm text-center">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Participants
+                </h6>
+
+                <h5>
+                    {{ trek.capacity - trek.available_slots }}
+                    /
+                    {{ trek.capacity }}
+                </h5>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Update Form -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        Update Trek
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Trek Status
+
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-select">
+
+                        <option value="Open"
+                            {% if trek.status=="Open" %}selected{% endif %}>
+                            Open
+                        </option>
+
+                        <option value="Closed"
+                            {% if trek.status=="Closed" %}selected{% endif %}>
+                            Closed
+                        </option>
+
+                        <option value="Completed"
+                            {% if trek.status=="Completed" %}selected{% endif %}>
+                            Completed
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Available Slots
+
+                    </label>
+
+                    <input
+                        type="number"
+                        name="available_slots"
+                        class="form-control"
+                        min="0"
+                        value="{{ trek.available_slots }}">
+
+                    <small class="text-muted">
+                        Increasing slots automatically increases trek capacity.
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between">
+
+                <a
+                    href="{{ url_for('staff.dashboard') }}"
+                    class="btn btn-secondary">
+
+                    Back
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    Update Trek
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Participants -->
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        Participants
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-bordered table-striped table-hover align-middle mb-0">
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Booking Date</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% if bookings %}
+
+                    {% for booking in bookings %}
+
+                    <tr>
+
+                        <td>{{ loop.index }}</td>
+
+                        <td>{{ booking.user.name }}</td>
+
+                        <td>{{ booking.user.email }}</td>
+
+                        <td>
+
+                            {{ booking.booking_date.strftime("%d-%m-%Y") }}
+
+                        </td>
+
+                        <td>
+
+                            {% if booking.status=="Booked" %}
+
+                                <span class="badge bg-success">
+                                    Booked
+                                </span>
+
+                            {% elif booking.status=="Cancelled" %}
+
+                                <span class="badge bg-danger">
+                                    Cancelled
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+                                    Completed
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="5" class="text-center">
+
+                            No participants yet.
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
 {% endblock %}
